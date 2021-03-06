@@ -7,6 +7,8 @@ import time
 import torch.optim as optim
 import argparse
 
+#####
+
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 parser.add_argument('--traindata', default='data/train.data',
@@ -120,6 +122,9 @@ for epoch in range(N_EPOCHS):
     if valid_loss < best_valid_loss:
         best_valid_loss = valid_loss
         torch.save(model.state_dict(), 'wordavg-model.pt')
+
+
+###
 
     print(f'Epoch: {epoch + 1:02} | Epoch Time: {epoch_mins}m {epoch_secs}s')
     print(f'\tTrain Loss: {train_loss:.3f} | Train Acc: {train_acc * 100:.2f}%')
