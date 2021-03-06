@@ -28,20 +28,24 @@ valid = data.Dataset(valid_examples, valid_fields)
 
 SEED = 1234
 torch.manual_seed(SEED)  # 为CPU设置随机种子
+torch.cuda.manual_seed(SEED)  #为GPU设置随机种子
+# 在程序刚开始加这条语句可以提升一点训练速度，没什么额外开销
+torch.backends.cudnn.deterministic = True
 # Load word embedding
 TEXT.build_vocab(train, max_size=25000, vectors="glove.6B.100d", unk_init=torch.Tensor.normal_)
 LABEL.build_vocab(train)
 
 
 
-BATCH_SIZE = 16
-
+BATCH_SIZE = 10
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # 相当于把样本划分batch，知识多做了一步，把相等长度的单词尽可能的划分到一个batch，不够长的就用padding。
 train_iterator, valid_iterator = data.BucketIterator.splits(
     (train, valid ),
     batch_size = BATCH_SIZE,
+    sort_key= lambda x : len(x.text),
+    sort_within_batch=False,
     device = device
 )
 
@@ -53,7 +57,7 @@ HIDDEN_DIM = 256
 OUTPUT_DIM = 1
 N_LAYERS = 2
 BIDIRECTIONAL = True
-DROPOUT = 0.5
+DROPOUT = 0.6
 # PAD_IDX = 1 为pad的索引
 PAD_IDX = TEXT.vocab.stoi[TEXT.pad_token]
 # Initialize the model
@@ -81,7 +85,7 @@ criterion = nn.BCEWithLogitsLoss()
 model = model.to(device)
 criterion = criterion.to(device)
 
-N_EPOCHS = 10
+N_EPOCHS = 50
 
 best_valid_loss = float('inf')  # 初试的验证集loss设置为无穷大
 
@@ -102,4 +106,4 @@ for epoch in range(N_EPOCHS):
 
     print(f'Epoch: {epoch + 1:02} | Epoch Time: {epoch_mins}m {epoch_secs}s')
     print(f'\tTrain Loss: {train_loss:.3f} | Train Acc: {train_acc * 100:.2f}%')
-    print(f'\t Val. Loss: {valid_loss:.3f} | Val. Acc: {valid_acc * 100:.2f} | Val. Prec: {valid_prec * 100:.2f} | {valid_recall * 100:.2f} | {valid_f1 * 100:.2f}%')
+    print(f'\t Val. Loss: {valid_loss:.3f} | Val. Acc: {valid_acc * 100:.2f}% | Val. Prec: {valid_prec * 100:.2f}% | Val. Recall: {valid_recall * 100:.2f}% | Val. F1: {valid_f1 * 100:.2f}%')
