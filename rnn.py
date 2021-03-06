@@ -107,7 +107,7 @@ criterion = nn.BCEWithLogitsLoss()
 model = model.to(device)
 criterion = criterion.to(device)
 N_EPOCHS = args.epochs
-best_valid_loss = float('inf')  # 初试的验证集loss设置为无穷大
+best_valid_loss = float('inf')  
 for epoch in range(N_EPOCHS):
     start_time = time.time()
     train_loss, train_acc = training(model, train_iterator, optimizer, criterion)
