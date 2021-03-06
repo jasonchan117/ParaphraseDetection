@@ -43,7 +43,7 @@ def binary_accuracy(preds, y):
     # .round函数 四舍五入，rounded_preds要么为0，要么为1
     # neg为0, pos为1
     rounded_preds = torch.round(torch.sigmoid(preds))
-
+    
     # convert into float for division
     """
     a = torch.tensor([1, 1])
@@ -120,28 +120,30 @@ def evaluate(model, iterator, criterion):
         sum_prec=0.
         sum_recall=0.
         sum_f1=0.
+        sum_acc=0.
         for batch in iterator:
             # 没有反向传播和梯度下降
 
             predictions = model(batch.text).squeeze(1)
             loss = criterion(predictions, batch.label)
-            acc = binary_accuracy(predictions, batch.label)
-            prec = precision_score(batch.label, predictions)
-            recall = recall_score(batch.label, predictions)
-            f1= f1_score(batch.label, predictions)
+            acc = accuracy_score(batch.label.cpu(), torch.round(torch.sigmoid(predictions)).cpu())
+            prec = precision_score(batch.label.cpu(), torch.round(torch.sigmoid(predictions)).cpu())
+            recall = recall_score(batch.label.cpu(), torch.round(torch.sigmoid(predictions)).cpu())
+            f1= f1_score(batch.label.cpu(), torch.round(torch.sigmoid(predictions)).cpu())
             sum_prec+=prec
             sum_f1+=f1
             sum_recall+=recall
+            sum_acc+=acc
 
             epoch_loss += loss.item() * len(batch.label)
-            epoch_acc += acc.item() * len(batch.label)
             total_len += len(batch.label)
 
             ind+=1
+
     # 调回训练模式
     model.train()
 
-    return epoch_loss / total_len, epoch_acc / total_len, sum_prec/ind, sum_recall/ind,sum_f1/ind
+    return epoch_loss / total_len, sum_acc/ind , sum_prec / ind, sum_recall / ind , sum_f1 / ind
 
 def epoch_time(start_time, end_time):
     elapsed_time = end_time - start_time
