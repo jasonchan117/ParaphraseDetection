@@ -6,6 +6,7 @@ import torch.nn.functional as F
 
 def loss_function(gt,pre):
   flag=1
+  
   for g,p in zip(gt,pre):
     if g.cpu().item == 0.:
         loss =F.binary_cross_entropy_with_logits(p,g) * (3996/7534)
@@ -16,7 +17,7 @@ def loss_function(gt,pre):
       flag=0
     else:
       sum_loss+=loss
-  return sum_loss
+  return sum_loss/gt.size(0)
 def getData(path):
     data=[]
     label=[]
