@@ -5,11 +5,19 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 def loss_function(gt,pre):
-    if gt == 0:
-        loss =F.binary_cross_entropy(pre,gt) * (3996/7534)
+  flag=1
+  
+  for g,p in zip(gt,pre):
+    if g.cpu().item == 0.:
+        loss =F.binary_cross_entropy_with_logits(p,g) * (3996/7534)
     else:
-        loss = F.binary_cross_entropy(pre,gt)
-    return loss
+        loss = F.binary_cross_entropy_with_logits(p,g)
+    if flag==1:
+      sum_loss=loss
+      flag=0
+    else:
+      sum_loss+=loss
+  return sum_loss/gt.size(0)
 def getData(path):
     data=[]
     label=[]
