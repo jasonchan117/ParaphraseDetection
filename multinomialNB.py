@@ -3,6 +3,9 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import precision_score, recall_score, f1_score,confusion_matrix,accuracy_score
 from utils import *
 import numpy as np
+import torch
+import numpy as np
+import torch.nn.functional as F
 from nltk.metrics.distance import edit_distance
 
 train_data, train_label=getData('data/train.data')
@@ -22,4 +25,7 @@ m = MultinomialNB(fit_prior=True)
 m.fit(x, train_label)
 np.set_printoptions(threshold=np.inf)
 vali_res=m.predict(cv.transform(vali_data))
+# str='Wonder if Barca will make a comeback The barca that dives cheats'
+# print(F.softmax(torch.from_numpy(np.array(m.predict_log_proba(cv.transform([str]))))))
+# print(m.predict(cv.transform([str])))
 print(precision_score(vali_label, vali_res), recall_score(vali_label, vali_res), f1_score(vali_label, vali_res),accuracy_score(vali_label, vali_res))
