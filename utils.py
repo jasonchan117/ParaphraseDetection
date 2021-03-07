@@ -1,6 +1,15 @@
 from tqdm import tqdm
 import torch
-from sklearn.metrics import precision_score, recall_score, f1_score,confusion_matrix,accuracy_score
+from sklearn.metrics import precision_score, recall_score, f1_score,accuracy_score
+import torch.nn as nn
+import torch.nn.functional as F
+
+def loss_function(gt,pre):
+    if gt == 0:
+        loss =F.binary_cross_entropy(pre,gt) * (3996/7534)
+    else:
+        loss = F.binary_cross_entropy(pre,gt)
+    return loss
 def getData(path):
     data=[]
     label=[]
@@ -45,7 +54,7 @@ def binary_accuracy(preds, y):
     return acc
 
 
-def training(model, iterator, optimizer, criterion):
+def training(model, iterator, optimizer):
     epoch_loss = 0
     epoch_acc = 0
     total_len = 0
@@ -57,7 +66,7 @@ def training(model, iterator, optimizer, criterion):
         optimizer.zero_grad()
         predictions = model(batch.text).squeeze(1)
 
-        loss = criterion(predictions, batch.label)
+        loss = loss_function( batch.label,predictions)
 
         acc = binary_accuracy(predictions, batch.label)
 

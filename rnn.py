@@ -103,14 +103,14 @@ model.embedding.weight.data[PAD_IDX] = torch.zeros(EMBEDDING_DIM)
 
 # Training model
 optimizer = optim.Adam(model.parameters(),lr=args.lr, weight_decay=args.weight_decay)
-criterion = nn.BCEWithLogitsLoss()
 model = model.to(device)
+criterion = nn.BCEWithLogitsLoss()
 criterion = criterion.to(device)
 N_EPOCHS = args.epochs
 best_valid_loss = float('inf')  
 for epoch in range(N_EPOCHS):
     start_time = time.time()
-    train_loss, train_acc = training(model, train_iterator, optimizer, criterion)
+    train_loss, train_acc = training(model, train_iterator, optimizer)
     # Derives the metric values including accuracy, precision, recall and f1.
     valid_loss, valid_acc, valid_prec, valid_recall, valid_f1 = evaluate(model, valid_iterator, criterion)
     end_time = time.time()
