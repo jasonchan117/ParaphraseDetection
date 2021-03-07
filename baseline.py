@@ -5,12 +5,9 @@ from utils import *
 train_data, train_label=getData('data/train.data')
 vali_data, vali_label=getData('data/dev.data')
 
-res = []
-ed=[]
-
-
+res=[]
 for i in vali_data:
-    if edit_distance(i[0],i[1]) >=40:
+    if edit_distance(i[0],i[1]) >=34.919:
         res.append(1)
     else:
         res.append(-1)
